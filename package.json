@@ -1,0 +1,22 @@
+{
+  "name": "sample-node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yamashiro0110/sample-node-js.git"
+  },
+  "author": "yamashiro0110",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/yamashiro0110/sample-node-js/issues"
+  },
+  "homepage": "https://github.com/yamashiro0110/sample-node-js#readme",
+  "dependencies": {
+    "request": "^2.88.0"
+  }
+}
