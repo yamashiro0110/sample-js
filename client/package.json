@@ -1,0 +1,23 @@
+{
+  "name": "sample-js-client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "server": "npx http-server ./src",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yamashiro0110/sample-js.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/yamashiro0110/sample-js/issues"
+  },
+  "homepage": "https://github.com/yamashiro0110/sample-js#readme",
+  "devDependencies": {
+    "http-server": "^0.11.1"
+  }
+}
