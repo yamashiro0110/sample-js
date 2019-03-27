@@ -1,4 +1,5 @@
 (function () {
+
   /*
    *
    *  :: cookies.js ::
@@ -67,69 +68,80 @@
     }
   };
 
-  function nowPlusHours(hours) {
-    var now = new Date();
-    now.setHours(now.getHours() + hours);
-    return now.toUTCString();
-  }
-
-  function updateCookie(params) {
-    var cookieName = params.cookie_name;
-    var cookieDomain = params.cookie_domain;
-    var existCookieValue = docCookies.getItem(cookieName);
-    console.log('exists cookie', params, existCookieValue);
-
-    docCookies.removeItem(cookieName);
-    console.log('remove cookie. cookieName:%s, docCookies.hasItem:%s', cookieName, docCookies.hasItem(cookieName));
-
-    var cookieExpiresDate = nowPlusHours(24 * 7);
-    docCookies.setItem(cookieName, cookieExpiresDate.toString(), cookieExpiresDate, '/', cookieDomain, false);
-    console.log('update cookie', params, docCookies.getItem(cookieName));
-  }
-
-  function createCookie(params) {
-    var cookieName = params.cookie_name;
-    var cookieDomain = params.cookie_domain;
-    var cookieExpiresDate = nowPlusHours(24 * 7);
-    docCookies.setItem(cookieName, cookieExpiresDate.toString(), cookieExpiresDate, '/', cookieDomain, false);
-    console.log('create cookie', params, docCookies.getItem(cookieName));
-  }
-
-  var cookieName = 'sample_js_cookie';
-  var domainParts = location.hostname.split('.').reverse();
-  console.log('domainParts', domainParts);
-
-  var domain = "";
-
-  var cookiesByName = docCookies.keys('sample_js');
-  console.log('cookiesByName', cookiesByName);
-
-  // TODO: cookie name of process
-  // cookiesByName.forEach((value, num) => {
-    for (var index = 0; index < domainParts.length; index++) {
-      var domainPart = domainParts[index];
-
-      if (domain === "") {
-        domain += '.' + domainParts[index];
-        console.log('continue. domain is empty...', domain, domainPart);
-        continue;
+  /**
+   * parse query parameter for cookie values.
+   *
+   * support query parameters.
+   *
+   * * cookie_name
+   * * cookie_value
+   * * domain
+   * * path
+   * * expires_hour
+   */
+  var CookieProperties = function () {
+    var params = function () {
+      // https://stackoverflow.com/questions/2090551/parse-query-string-in-javascript?answertab=votes#tab-top
+      var query = {};
+      var queryString = window.location.search;
+      var pairs = (queryString[0] === '?' ? queryString.substr(1) : queryString).split('&');
+      for (var i = 0; i < pairs.length; i++) {
+        var pair = pairs[i].split('=');
+        query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
       }
+      return query;
+    }();
 
-      domain = '.' + domainPart + domain;
-      console.log('add domainPart. domainPart:%s, domain:%s', domainPart, domain);
+    return {
+      "cookieName": function () {
+        return params['cookie_name'] || '';
+      },
+      "cookieValue": function () {
+        return params['cookie_value'] || '';
+      },
+      "domain": function () {
+        return params['domain'] || '';
+      },
+      "path": function () {
+        return params['path'] || '/';
+      },
+      "expires": function () {
+        if (!params['expires_days']) {
+          return new Date();
+        }
 
-      if (docCookies.hasItem(cookieName)) {
-        updateCookie({
-          "cookie_name": cookieName,
-          "cookie_domain": domain
-        });
-      } else {
-        createCookie({
-          "cookie_name": cookieName,
-          "cookie_domain": domain
-        });
+        var expireDays = params['expires_days'];
+        var expires = new Date();
+        expires.setDate(expires.getDate() + Number.parseInt(expireDays));
+        return expires;
       }
     }
-  // });
+  };
 
+  var cookieProperties = new CookieProperties();
+  var cookieName = cookieProperties.cookieName();
+  var cookieValue = cookieProperties.cookieValue();
+  var expires = cookieProperties.expires();
+  var path = cookieProperties.path();
+  var domain = cookieProperties.domain();
+
+  console.table([
+    cookieName,
+    cookieValue,
+    expires.toUTCString(),
+    path,
+    domain
+  ]);
+
+
+  docCookies.setItem(
+    cookieName,
+    cookieValue,
+    expires,
+    path,
+    domain,
+    false
+  );
+
+  console.log(`set cookie. name:${cookieName}, value:${docCookies.getItem(cookieName)}`);
 })();
